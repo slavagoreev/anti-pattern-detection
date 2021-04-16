@@ -22,6 +22,5 @@
 .menu {
     display: flex;
     flex-direction: column;
-    position: sticky;
-    top: 0;
+    margin-bottom: 20px;
 }

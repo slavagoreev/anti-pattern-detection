@@ -53,8 +53,8 @@ export default function Home() {
         <section>
           <Container>
             <Row>
-              <Col sm={3}>
-                <Nav variant="pills" className={styles.menu}>
+              <Col md={3} className={styles.menu}>
+                <Nav variant="pills" className="flex-column">
                   {Object.keys(files).map(file => (
                     <Nav.Item key={file}>
                       <Nav.Link
@@ -76,7 +76,7 @@ export default function Home() {
                   <code>{JSON.stringify(prediction, null, 4)}</code>
                 )}
               </Col>
-              <Col sm={9}>
+              <Col md={9}>
                 <header className={styles.header}>
                   <span className={styles.header__title}>
                     {file.name}
