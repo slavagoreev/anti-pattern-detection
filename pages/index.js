@@ -3,7 +3,7 @@ import styles from '../styles/Home.module.css'
 import {Container, Jumbotron, Row, Tab, Col, Nav, Button} from "react-bootstrap";
 import Editor from "@monaco-editor/react";
 import { files } from "../utils/files"
-import {useCallback, useEffect, useRef, useState} from "react";
+import {useCallback, useRef, useState} from "react";
 
 export default function Home() {
   const [fileName, setFileName] = useState("Sample1.java");
@@ -19,10 +19,11 @@ export default function Home() {
     const blob = new Blob([currentContent.current], { type: 'text/java' });
     formData.append('file', blob, fileName);
 
-    fetch('http://84.252.131.192:5000/predict', {
+    fetch('https://cors-anywhere.herokuapp.com/http://84.252.131.192:5000/predict', {
       method: 'POST',
       body: formData
-    }).then((prediction) => {
+    }).then(response => response.json())
+      .then((prediction) => {
       console.log(prediction);
       setPrediction(prediction);
     }).finally(() => {
