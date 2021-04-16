@@ -82,7 +82,7 @@ export default function Home() {
                 <Button variant="primary" onClick={() => analyze()}>
                   {isLoading ? 'Loading…' : `Analyze "${fileName}"`}
                 </Button>
-                {!isLoading ? (typeof prediction === 'string' ? <Alert>{prediction}</Alert> : (
+                {!isLoading ? (typeof prediction === 'string' ? <Alert>{prediction}</Alert> : prediction && (
                   <ListGroup className="mt-3">
                     {Object.entries(prediction).map(([key, prob]) => (
                       <ListGroup.Item key={key}>{t[key]} {(prob * 100).toFixed(2)}%</ListGroup.Item>
