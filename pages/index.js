@@ -22,13 +22,16 @@ export default function Home() {
     fetch('https://cors-anywhere.herokuapp.com/http://84.252.131.192:5000/predict', {
       method: 'POST',
       body: formData
-    }).then(response => response.json())
+    })
+      .then(response => response.json())
       .then((prediction) => {
-      console.log(prediction);
-      setPrediction(prediction);
-    }).finally(() => {
-      setLoading(false);
-    });
+        console.log(prediction);
+        setPrediction(prediction);
+      })
+      .catch(() => setPrediction({ error: 'Server is not responding' }))
+      .finally(() => {
+        setLoading(false);
+      });
   }, [file]);
 
   return (
@@ -74,7 +77,7 @@ export default function Home() {
                   {isLoading ? 'Loading…' : `Analyze "${fileName}"`}
                 </Button>
                 {!isLoading && prediction && (
-                  <code>{JSON.stringify(prediction, null, 4)}</code>
+                  <code className="mt-3">{JSON.stringify(prediction, null, 4)}</code>
                 )}
               </Col>
               <Col md={9}>
