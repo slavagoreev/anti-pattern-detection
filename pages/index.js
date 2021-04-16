@@ -1,65 +1,100 @@
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
+import {Container, Jumbotron, Row, Tab, Col, Nav, Button} from "react-bootstrap";
+import Editor from "@monaco-editor/react";
+import { files } from "../utils/files"
+import {useCallback, useEffect, useRef, useState} from "react";
 
 export default function Home() {
+  const [fileName, setFileName] = useState("Sample1.java");
+  const currentContent = useRef('');
+  const [isLoading, setLoading] = useState(false);
+  const [prediction, setPrediction] = useState(null);
+
+  const file = files[fileName];
+
+  const analyze = useCallback(() => {
+    setLoading(true);
+    const formData = new FormData();
+    const blob = new Blob([currentContent.current], { type: 'text/java' });
+    formData.append('file', blob, fileName);
+
+    fetch('http://84.252.131.192:5000/predict', {
+      method: 'POST',
+      body: formData
+    }).then((prediction) => {
+      console.log(prediction);
+      setPrediction(prediction);
+    }).finally(() => {
+      setLoading(false);
+    });
+  }, [file]);
+
   return (
-    <div className={styles.container}>
+    <div >
       <Head>
-        <title>Create Next App</title>
+        <title>Anti-pattern detection</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
+        <Jumbotron fluid>
+          <Container>
+            <h3>Anti-pattern Detection Using Machine Learning</h3>
+            <h6 className="text-muted">Artemii Bykov, Maxim Salo, Vyacheslav Goreev</h6>
+            <p className={styles.description}>
+              Demonstration of analyzing a real-world code using machine learning.
+              The syntax flaw detection may be formalized using type rules or content-free grammars.
+              However, many anti-patterns do not have a straightforward definition because there
+              exist no standard notations which can be used to describe them.
             </p>
-          </a>
-        </div>
+          </Container>
+        </Jumbotron>
+        <section>
+          <Container>
+            <Row>
+              <Col sm={3}>
+                <Nav variant="pills" className={styles.menu}>
+                  {Object.keys(files).map(file => (
+                    <Nav.Item key={file}>
+                      <Nav.Link
+                        eventKey={file}
+                        active={fileName === file}
+                        disabled={fileName === file}
+                        onClick={() => setFileName(file)}
+                      >
+                        {file}
+                      </Nav.Link>
+                    </Nav.Item>
+                  ))}
+                </Nav>
+                <hr/>
+                <Button variant="primary" onClick={() => analyze()}>
+                  {isLoading ? 'Loading…' : `Analyze "${fileName}"`}
+                </Button>
+                {!isLoading && prediction && (
+                  <code>{JSON.stringify(prediction, null, 4)}</code>
+                )}
+              </Col>
+              <Col sm={9}>
+                <header className={styles.header}>
+                  <span className={styles.header__title}>
+                    {file.name}
+                  </span>
+                </header>
+                <Editor
+                  height="90vh"
+                  theme="vs-dark"
+                  path={file.name}
+                  defaultLanguage={file.language}
+                  defaultValue={file.value}
+                  onChange={(content) => currentContent.current = content}
+                />
+              </Col>
+            </Row>
+          </Container>
+        </section>
       </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
     </div>
   )
 }
