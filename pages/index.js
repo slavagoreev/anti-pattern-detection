@@ -1,9 +1,16 @@
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
-import {Container, Jumbotron, Row, Tab, Col, Nav, Button} from "react-bootstrap";
+import {Container, Jumbotron, Row, Tab, Col, Nav, Button, Alert, ListGroup} from "react-bootstrap";
 import Editor from "@monaco-editor/react";
 import { files } from "../utils/files"
 import {useCallback, useRef, useState} from "react";
+
+const t = {
+  data_class: 'Data class',
+  feature_envy: 'Feature envy',
+  god_classes: 'God class',
+  parallel_inheritance_hierarchies: 'Parallel inheritance'
+}
 
 export default function Home() {
   const [fileName, setFileName] = useState("Sample1.java");
@@ -16,7 +23,7 @@ export default function Home() {
   const analyze = useCallback(() => {
     setLoading(true);
     const formData = new FormData();
-    const blob = new Blob([currentContent.current], { type: 'text/java' });
+    const blob = new Blob([currentContent.current || file.value], { type: 'text/plain' });
     formData.append('file', blob, fileName);
 
     fetch('https://cors-anywhere.herokuapp.com/http://84.252.131.192:5000/predict', {
@@ -25,10 +32,9 @@ export default function Home() {
     })
       .then(response => response.json())
       .then((prediction) => {
-        console.log(prediction);
         setPrediction(prediction);
       })
-      .catch(() => setPrediction({ error: 'Server is not responding' }))
+      .catch(() => setPrediction('Server is not responding'))
       .finally(() => {
         setLoading(false);
       });
@@ -72,13 +78,17 @@ export default function Home() {
                     </Nav.Item>
                   ))}
                 </Nav>
-                <hr/>
+                <hr className="dropdown-divider my-5"/>
                 <Button variant="primary" onClick={() => analyze()}>
                   {isLoading ? 'Loading…' : `Analyze "${fileName}"`}
                 </Button>
-                {!isLoading && prediction && (
-                  <code className="mt-3">{JSON.stringify(prediction, null, 4)}</code>
-                )}
+                {!isLoading ? (typeof prediction === 'string' ? <Alert>{prediction}</Alert> : (
+                  <ListGroup className="mt-3">
+                    {Object.entries(prediction).map(([key, prob]) => (
+                      <ListGroup.Item key={key}>{t[key]} {(prob * 100).toFixed(2)}%</ListGroup.Item>
+                    ))}
+                  </ListGroup>
+                )) : null}
               </Col>
               <Col md={9}>
                 <header className={styles.header}>
