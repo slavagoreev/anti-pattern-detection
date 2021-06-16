@@ -26,7 +26,7 @@ export default function Home() {
     const blob = new Blob([currentContent.current || file.value], { type: 'text/plain' });
     formData.append('file', blob, fileName);
 
-    fetch('https://cors-anywhere.herokuapp.com/http://84.252.131.192:5000/predict', {
+    fetch('https://antipattern.detection.the-o.co/predict', {
       method: 'POST',
       body: formData
     })
