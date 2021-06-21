@@ -23,8 +23,11 @@ export default function Home() {
   const analyze = useCallback(() => {
     setLoading(true);
     const formData = new FormData();
-    const blob = new Blob([currentContent.current || file.value], { type: 'text/plain' });
-    formData.append('file', blob, fileName);
+    const blob = new Blob([currentContent.current || file.value]);
+    const fileNameJava = file.name.split('/').slice(-1)[0];
+    const fileObject = new File([blob], fileNameJava, { type: 'text/plain' });
+    console.log(fileNameJava, fileObject);
+    formData.append('file', fileObject, fileNameJava);
 
     fetch('https://antipattern.detection.the-o.co/predict', {
       method: 'POST',

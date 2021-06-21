@@ -1,6 +1,7 @@
 import Sample1 from './Registry.java';
 import Sample2 from './Client.java';
 import Sample3 from './Validator.java';
+import playground from './playground.java';
 
 export const files = {
   "Sample1.java": {
@@ -21,6 +22,6 @@ export const files = {
   "Your own file": {
     name: "playground.java",
     language: "java",
-    value: '// Write your code here',
+    value: playground,
   },
 }
